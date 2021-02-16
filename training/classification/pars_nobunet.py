@@ -1,4 +1,5 @@
 import h5py
+import numpy as np
 import re
 import os
 
@@ -17,14 +18,15 @@ def read_hdf5(rpath, wpath):
                 wfile = f[key].name
                 wfile = re.sub(r'^\/', '', wfile)
                 wfile = re.sub(r'\/', '_', wfile)
-                wfile = re.sub(':0$', '.txt', wfile)
+                wfile = re.sub('^', f'./{wpath}/', wfile)
+                wfile = re.sub(':0$', '.h', wfile)
                 try:
-                    if re.search('^optimizer_weights', wfile): raise Exception
-                    print (f'generating {wfile} ...')
-                    ofs = open(f'./{wpath}/{wfile}', mode='w')
-                    print(f'{f[key].name}, {f[(key)]}')
-                    # ofs.write(f[(key)])
-                    ofs.close
+                    if re.search('optimizer_weights', wfile): raise Exception
+                    np.arry = f[(key)]
+                    print (f'generating {wfile} ..., shape={np.arry.shape}, dtype={np.arry.dtype}')
+                    np.savetxt(wfile, np.arry)
+                    # ofs = open(f'./{wpath}/{wfile}', mode='w')
+                    # ofs.close
                 except Exception:
                     pass
 
