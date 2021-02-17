@@ -15,18 +15,24 @@ def read_hdf5(rpath, wpath):
         f.visit(keys.append) # append all keys to list
         for key in keys:
             if ':' in key: # contains data if ':' in key
-                wfile = f[key].name
-                wfile = re.sub(r'^\/', '', wfile)
-                wfile = re.sub(r'\/', '_', wfile)
-                wfile = re.sub('^', f'./{wpath}/', wfile)
-                wfile = re.sub(':0$', '.h', wfile)
+                wpath = f[key].name
+                wpath = re.sub(r'^\/', '', wpath)
+                wpath = re.sub(r'\/', '_', wpath)
+                wpath = re.sub(':0$', '', wpath)
+                arry_name = wpath
+                wpath = re.sub('^', f'./{weights_dirname}/', wpath)
+                wpath = re.sub('$', '.h', wpath)
                 try:
-                    if re.search('optimizer_weights', wfile): raise Exception
+                    if re.search('optimizer_weights', wpath): raise Exception
                     np.arry = f[(key)]
-                    print (f'generating {wfile} ..., shape={np.arry.shape}, dtype={np.arry.dtype}')
-                    np.savetxt(wfile, np.arry)
-                    # ofs = open(f'./{wpath}/{wfile}', mode='w')
-                    # ofs.close
+                    disp = f'generating {wpath} ..., shape={np.arry.shape}, dtype={np.arry.dtype}'
+                    print (disp)
+                    header = '// '
+                    header += disp
+                    header += '\n'
+                    header += f'float {arry_name}[] = '
+                    header += '{'
+                    np.savetxt(wpath, np.arry, header=header, footer='};', delimiter=',', newline=',\n', comments='')
                 except Exception:
                     pass
 
