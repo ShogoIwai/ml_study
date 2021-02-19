@@ -21,5 +21,4 @@ if __name__ == '__main__':
         mdlfile = opts['mdl']
         imgdir = opts['img']
 
-        iic.filter(imgdir, ext)
         iic.classification(mdlfile, imgdir, ext, image_size, div=True)
