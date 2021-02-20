@@ -7,6 +7,10 @@ import cv2
 import glob
 import re
 import os
+import sys
+
+sys.path.append(os.path.abspath('../../'))
+from common.arydmp import arydmp as ad
 
 def classification_single(mdlfile, imgdir, image_size, div=False):
     model = load_model(mdlfile)
@@ -17,6 +21,14 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
     img_array = keras.preprocessing.image.img_to_array(img)
     if (div):
         img_array = img_array / 255.0
+
+    wpath = f'./image'
+    if not os.path.isdir(f'{wpath}'):
+        os.mkdir(f'{wpath}')
+    write_file = f'{wpath}/{image_file}'
+    write_file = re.sub('\.jpg$', '.h', write_file)
+    ad.array_dump(img_array, write_file, 'input_image')
+
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
     predictions = model.predict(img_array)
     print(f"[DEBUG] {image_file}:{predictions}")
