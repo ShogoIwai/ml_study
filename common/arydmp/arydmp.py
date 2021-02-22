@@ -2,10 +2,13 @@ import numpy as np
 
 def array_dump(array, fname, aname):
     array = np.array(array)
-    disp = f'generating {fname} ..., shape={array.shape}, dtype={array.dtype}'
-    print (disp)
+    array_shape = array.shape
+    array_dtype = array.dtype
     array = array.flatten()
-    header = '// ' + disp + '\n' + f'float {aname}[] = ' + '{' + '\n'
+    array_size = array.size
+    disp = f'generating {fname} ..., shape={array_shape}->{aname}[{array_size}], dtype={array_dtype}'
+    print (disp)
+    header = '// ' + disp + '\n' + f'const float {aname}[] = ' + '{' + '\n'
     ofs = open(fname, mode='w')
     ofs.write(header)
     for i in range(array.size):
