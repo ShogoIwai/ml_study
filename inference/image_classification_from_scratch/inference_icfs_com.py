@@ -12,6 +12,26 @@ import sys
 sys.path.append(os.path.abspath('../../'))
 from common.arydmp import arydmp as ad
 
+def export_input_image(img_array, iamge_dir, image_file):
+    if not os.path.isdir(f'{iamge_dir}'):
+        os.mkdir(f'{iamge_dir}')
+    write_file = f'{iamge_dir}/{image_file}'
+    write_file = re.sub('\.jpg$', '.h', write_file)
+    ad.array_dump(img_array, write_file, 'input_image')
+
+def export_input_layer(model, img_array, layer_dir, layer_names):
+    if not os.path.isdir(f'{layer_dir}'):
+        os.mkdir(f'{layer_dir}')
+    for idx in range(len(layer_names)):
+        layer_name = layer_names[idx]
+        layer_model = keras.Model(inputs=model.input,
+                                  outputs=model.get_layer(layer_name).output)
+        if (idx == 0): predictions = layer_model.predict(img_array)
+        else: predictions = layer_model.predict(predictions)
+        write_file = f'{layer_dir}/{layer_name}'
+        write_file = re.sub('$', '.h', write_file)
+        ad.array_dump(predictions, write_file, layer_name)
+
 def classification_single(mdlfile, imgdir, image_size, div=False):
     model = load_model(mdlfile)
     model.summary()
@@ -22,26 +42,27 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
     if (div):
         img_array = img_array / 255.0
 
-    wpath = f'./image'
-    if not os.path.isdir(f'{wpath}'):
-        os.mkdir(f'{wpath}')
-    write_file = f'{wpath}/{image_file}'
-    write_file = re.sub('\.jpg$', '.h', write_file)
-    ad.array_dump(img_array, write_file, 'input_image')
+    iamge_dir = f'./image'
+    export_input_image(img_array, iamge_dir, image_file)
 
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
+
+    layer_dir = f'./layers'
+    layer_names = ['conv2d']
+    export_input_layer(model, img_array, layer_dir, layer_names)
+
     predictions = model.predict(img_array)
     print(f"[DEBUG] {image_file}:{predictions}")
 
-    predict_max = np.amax(predictions[0])
-    predict_idx = np.argmax(predictions[0])
-    plt.title(str(float("{:.2f}".format(predict_max))) + f"[{predict_idx}]")
-    plt.axis("off")
+    # image = cv2.imread(image_file)
+    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # plt.title(str(float("{:.2f}".format(predict_max))) + f"[{predict_idx}]")
 
-    image = cv2.imread(image_file)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    plt.imshow(image)
-    plt.show()
+    # plt.axis("off")
+    # predict_max = np.amax(predictions[0])
+    # predict_idx = np.argmax(predictions[0])
+    # plt.imshow(image)
+    # plt.show()
 
 def filter(imgdir, ext):
     image_files = glob.glob(f"{imgdir}*/**", recursive=True)
