@@ -26,8 +26,7 @@ def export_input_layer(model, img_array, layer_dir, layer_names):
         layer_name = layer_names[idx]
         layer_model = keras.Model(inputs=model.input,
                                   outputs=model.get_layer(layer_name).output)
-        if (idx == 0): predictions = layer_model.predict(img_array)
-        else: predictions = layer_model.predict(predictions)
+        predictions = layer_model.predict(img_array)
         write_file = f'{layer_dir}/{layer_name}'
         write_file = re.sub('$', '.h', write_file)
         ad.array_dump(predictions, write_file, layer_name)
@@ -48,7 +47,27 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
 
     layer_dir = f'./layers'
-    layer_names = ['conv2d']
+    layer_names = ['conv2d',
+                   'batch_normalization',
+                   'activation',
+                   'max_pooling2d',
+                   'conv2d_1',
+                   'batch_normalization_1',
+                   'activation_1',
+                   'max_pooling2d_1',
+                   'conv2d_2',
+                   'batch_normalization_2',
+                   'activation_2',
+                   'max_pooling2d_2',
+                   'conv2d_3',
+                   'batch_normalization_3',
+                   'activation_3',
+                   'max_pooling2d_3',
+                   'flatten',
+                   'dense',
+                   'batch_normalization_4',
+                   'activation_4',
+                   'dense_1']
     export_input_layer(model, img_array, layer_dir, layer_names)
 
     predictions = model.predict(img_array)
