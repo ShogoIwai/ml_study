@@ -19,15 +19,17 @@ def export_input_image(img_array, iamge_dir, image_file):
     write_file = re.sub('\.jpg$', '.h', write_file)
     ad.array_dump(img_array, write_file, 'input_image')
 
-def export_input_layer(model, img_array, layer_dir, layer_names):
+def export_input_layer(model, img_array, layer_dir, sub_dir, layer_names):
     if not os.path.isdir(f'{layer_dir}'):
         os.mkdir(f'{layer_dir}')
+    if not os.path.isdir(f'{layer_dir}/{sub_dir}'):
+        os.mkdir(f'{layer_dir}/{sub_dir}')
     for idx in range(len(layer_names)):
         layer_name = layer_names[idx]
         layer_model = keras.Model(inputs=model.input,
                                   outputs=model.get_layer(layer_name).output)
         predictions = layer_model.predict(img_array)
-        write_file = f'{layer_dir}/{layer_name}'
+        write_file = f'{layer_dir}/{sub_dir}/{layer_name}'
         write_file = re.sub('$', '.h', write_file)
         ad.array_dump(predictions, write_file, layer_name)
 
@@ -47,6 +49,7 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
 
     layer_dir = f'./layers'
+    sub_dir = re.sub('\.jpg$', '', image_file)
     layer_names = ['conv2d',
                    'batch_normalization',
                    'activation',
@@ -68,7 +71,7 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
                    'batch_normalization_4',
                    'activation_4',
                    'dense_1']
-    export_input_layer(model, img_array, layer_dir, layer_names)
+    export_input_layer(model, img_array, layer_dir, sub_dir, layer_names)
 
     predictions = model.predict(img_array)
     print(f"[DEBUG] {image_file}:{predictions}")
