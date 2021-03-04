@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from google_images_download_patched import googleimagesdownload
+from google_images_download import googleimagesdownload
 import re
 
 global opts
