@@ -12,14 +12,14 @@ import sys
 sys.path.append(os.path.abspath('../../'))
 from common.arydmp import arydmp as ad
 
-def export_input_image(img_array, iamge_dir, image_file):
+def export_input_image(img_array, iamge_dir, image_file, float_flag):
     if not os.path.isdir(f'{iamge_dir}'):
         os.mkdir(f'{iamge_dir}')
     write_file = f'{iamge_dir}/{image_file}'
     write_file = re.sub('\.jpg$', '.h', write_file)
-    ad.array_dump(img_array, write_file, 'input_image')
+    ad.array_dump(img_array, write_file, 'input_image', float_flag)
 
-def export_input_layer(model, img_array, layer_dir, sub_dir, layer_names):
+def export_input_layer(model, img_array, layer_dir, sub_dir, layer_names, float_flag):
     if not os.path.isdir(f'{layer_dir}'):
         os.mkdir(f'{layer_dir}')
     if not os.path.isdir(f'{layer_dir}/{sub_dir}'):
@@ -31,7 +31,7 @@ def export_input_layer(model, img_array, layer_dir, sub_dir, layer_names):
         predictions = layer_model.predict(img_array)
         write_file = f'{layer_dir}/{sub_dir}/{layer_name}'
         write_file = re.sub('$', '.h', write_file)
-        ad.array_dump(predictions, write_file, layer_name)
+        ad.array_dump(predictions, write_file, layer_name, float_flag)
 
 def classification_single(mdlfile, imgdir, image_size, div=False):
     model = load_model(mdlfile)
@@ -44,7 +44,7 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
         img_array = img_array / 255.0
 
     iamge_dir = f'./image'
-    export_input_image(img_array, iamge_dir, image_file)
+    export_input_image(img_array, iamge_dir, image_file, div)
 
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
 
@@ -71,7 +71,7 @@ def classification_single(mdlfile, imgdir, image_size, div=False):
                    'batch_normalization_4',
                    'activation_4',
                    'dense_1']
-    export_input_layer(model, img_array, layer_dir, sub_dir, layer_names)
+    export_input_layer(model, img_array, layer_dir, sub_dir, layer_names, div)
 
     predictions = model.predict(img_array)
     print(f"[DEBUG] {image_file}:{predictions}")

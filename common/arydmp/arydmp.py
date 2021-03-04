@@ -1,6 +1,6 @@
 import numpy as np
 
-def array_dump(array, fname, aname):
+def array_dump(array, fname, aname, fflag=True):
     array = np.array(array)
     array_shape = array.shape
     array_dtype = array.dtype
@@ -8,7 +8,10 @@ def array_dump(array, fname, aname):
     array_size = array.size
     disp = f'generating {fname} ..., shape={array_shape}->{aname}[{array_size}], dtype={array_dtype}'
     print (disp)
-    header = '// ' + disp + '\n' + f'const float {aname}[] = ' + '{' + '\n'
+    if (fflag):
+        header = '// ' + disp + '\n' + f'const float {aname}[] = ' + '{' + '\n'
+    else:
+        header = '// ' + disp + '\n' + f'const int {aname}[] = ' + '{' + '\n'
     ofs = open(fname, mode='w')
     ofs.write(header)
     for i in range(array.size):

@@ -8,9 +8,11 @@ def parseOptions():
     argparser = ArgumentParser()
     argparser.add_argument('--mdl', help=':specify model file name') # use action='store_true' as flag
     argparser.add_argument('--img', help=':specify image dir path') # use action='store_true' as flag
+    argparser.add_argument('--int', help=':int input flag', action='store_true') # use action='store_true' as flag
     args = argparser.parse_args()
     if args.mdl: opts.update({'mdl':args.mdl})
     if args.img: opts.update({'img':args.img})
+    if args.int: opts.update({'int':args.int})
 
 ext = r'\.jpg$'
 image_size = (150, 150)
@@ -21,4 +23,7 @@ if __name__ == '__main__':
         mdlfile = opts['mdl']
         imgdir = opts['img']
 
-        iic.classification(mdlfile, imgdir, ext, image_size, div=True)
+        if 'int' in opts.keys():
+            iic.classification(mdlfile, imgdir, ext, image_size, div=False)
+        else:
+            iic.classification(mdlfile, imgdir, ext, image_size, div=True)
