@@ -26,7 +26,6 @@ y_test  = []
 #1行目のfor 変数1, 変数2 in enumerate(list):では、listをenumerateで取得できる間
 #ずっと、変数1と変数2に代入し続けるfor文を使用。
 
-
 for index, classlabel in enumerate(classes):
     photos_dir = "./images/" + classlabel
     files = glob.glob(photos_dir + "/*.jpg") #引数に指定されたパターンにマッチするファイルパス名を取得
@@ -56,8 +55,10 @@ for index, classlabel in enumerate(classes):
                 #X_train.append(data)
                 #y_train.append(index)
 
-print(len(X_train))
-print(len(X_test))
+print(f'X_train={len(X_train)}')
+print(f'X_test={len(X_test)}')
+print(f'y_train={len(y_train)}')
+print(f'y_test={len(y_test)}')
 X_train = np.array(X_train)
 X_test  = np.array(X_test)
 y_train = np.array(y_train)
@@ -66,23 +67,19 @@ y_test  = np.array(y_test)
 xy = (X_train, X_test, y_train, y_test)
 np.save("./dog_cat_giraffe_elephant_lion.npy", xy)
 
-
 #■ネットワークの作成
-import tensorflow as tf
-from keras import layers
-from keras import models
-from keras import optimizers
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.utils import np_utils
-from keras.layers.normalization import BatchNormalization
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras import models
+from tensorflow.keras import optimizers
+from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
-%matplotlib inline
-
 
 classes = ["dog", "cat", "giraffe", "elephant", "lion"]
 num_classes = len(classes)
 image_size = 150
-
 
 """
 データを読み込む関数
@@ -93,14 +90,13 @@ def load_data():
     X_train = X_train.astype("float") / 255
     X_test  = X_test.astype("float") / 255
     # to_categorical()にてラベルをone hot vector化
-    y_train = np_utils.to_categorical(y_train, num_classes)
-    y_test  = np_utils.to_categorical(y_test, num_classes)
+    y_train = to_categorical(y_train, num_classes)
+    y_test  = to_categorical(y_test, num_classes)
 
     return X_train, y_train, X_test, y_test
 
 def train(X_train, y_train, X_test, y_test):
-    model = tf.keras.models.Sequential()
-
+    model = keras.models.Sequential()
 
     #畳み込み層(Convolution layer) ニューロン数32, 3*3のフィルターを使用
     model.add(layers.Conv2D(32,(3,3),padding='same',input_shape=X_train.shape[1:]))
@@ -139,7 +135,7 @@ def train(X_train, y_train, X_test, y_test):
     #出力層
     model.add(layers.Dense(num_classes,activation="softmax"))
 
-    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
+    model.compile(loss=keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
                  optimizer=optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False),
                  metrics=["acc"])
     history =model.fit(X_train, y_train,#画像とラベルデータ
@@ -147,7 +143,7 @@ def train(X_train, y_train, X_test, y_test):
                  epochs=30,
                  validation_data=(X_test, y_test),
                  shuffle=True)
-    model.save('./cats_dogs_giraffes_elephants_lions_classification.h5')
+    model.save('./cats_dogs_giraffes_elephants_lions_classification_.h5')
 
     model.summary()
 
@@ -171,8 +167,6 @@ def train(X_train, y_train, X_test, y_test):
     plt.show()
 
     return model
-
-
 
 """
 メイン関数

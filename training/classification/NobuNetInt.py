@@ -13,8 +13,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 classes = ["dog", "cat", "giraffe", "elephant", "lion"]
 num_classes = len(classes)#リストや文字列など様々な型のオブジェクトのサイズ（要素数や文字数）を取得
 image_size = 150
-# num_testdata = 300
-num_testdata = 20
+num_testdata = 300
 
 X_train = []
 X_test  = []
@@ -88,8 +87,10 @@ image_size = 150
 def load_data():
     X_train, X_test, y_train, y_test = np.load("./dog_cat_giraffe_elephant_lion.npy", allow_pickle=True)
     # 入力データの各画素値を0-1の範囲で正規化(学習コストを下げるため)
-    X_train = X_train.astype(dtype="int32")
-    X_test  = X_test.astype(dtype="int32")
+    # X_train = X_train.astype("float") / 255
+    # X_test  = X_test.astype("float") / 255
+    X_train = X_train.astype("int32")
+    X_test  = X_test.astype("int32")
     # to_categorical()にてラベルをone hot vector化
     y_train = to_categorical(y_train, num_classes)
     y_test  = to_categorical(y_test, num_classes)
@@ -101,8 +102,7 @@ def train(X_train, y_train, X_test, y_test):
     model = keras.models.Sequential()
 
     #畳み込み層(Convolution layer) ニューロン数32, 3*3のフィルターを使用
-    # model.add(layers.Conv2D(32,(3,3),padding='same',input_shape=X_train.shape[1:],dtype='int32'))
-    model.add(layers.Conv2D(32,(3,3),padding='same',dtype='int32'))
+    model.add(layers.Conv2D(32,(3,3),padding='same',input_shape=X_train.shape[1:],dtype='int32'))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
 
