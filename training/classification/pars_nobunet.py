@@ -16,7 +16,7 @@ def parseOptions():
     args = argparser.parse_args()
     if args.int: opts.update({'int':args.int})
 
-def read_hdf5(rfile, wpath, fflag=True):
+def read_hdf5(rfile, wpath, iflag=False):
     if not os.path.isdir(f'{wpath}'):
         os.mkdir(f'{wpath}')
 
@@ -34,7 +34,7 @@ def read_hdf5(rfile, wpath, fflag=True):
                 write_file = re.sub('$', '.h', write_file)
                 try:
                     if re.search('optimizer_weights', write_file): raise Exception
-                    ad.array_dump(f[(key)], write_file, array_name, fflag)
+                    ad.array_dump(f[(key)], write_file, array_name, iflag)
                 except Exception:
                     pass
 
@@ -43,6 +43,6 @@ if __name__ == '__main__':
     model_filename = './cats_dogs_giraffes_elephants_lions_classification.h5'
     weights_dirname = './weights'
     if 'int' in opts.keys():
-        read_hdf5(model_filename, weights_dirname, fflag=False)
+        read_hdf5(model_filename, weights_dirname, iflag=True)
     else:
-        read_hdf5(model_filename, weights_dirname, fflag=True)
+        read_hdf5(model_filename, weights_dirname, iflag=False)

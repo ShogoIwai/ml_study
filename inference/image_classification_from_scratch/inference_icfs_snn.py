@@ -24,6 +24,6 @@ if __name__ == '__main__':
         imgdir = opts['img']
 
         if 'int' in opts.keys():
-            iic.classification(mdlfile, imgdir, ext, image_size, div=False)
+            iic.classification(mdlfile, imgdir, ext, image_size, int_flag=True, div=True)
         else:
-            iic.classification(mdlfile, imgdir, ext, image_size, div=True)
+            iic.classification(mdlfile, imgdir, ext, image_size, int_flag=False, div=True)
