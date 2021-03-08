@@ -34,6 +34,34 @@ def export_input_layer(model, img_array, layer_dir, sub_dir, layer_names, int_fl
         ad.array_dump(predictions, write_file, layer_name, int_flag)
 
 def classification_single(mdlfile, imgdir, image_size, int_flag=False, div=False):
+    if (int_flag):
+        classification_single_int(mdlfile, imgdir, image_size, div=div)
+    else:
+        classification_single_float(mdlfile, imgdir, image_size, div=div)
+
+def classification_single_int(mdlfile, imgdir, image_size, div=False):
+    interpreter = tf.lite.Interpreter(model_path=mdlfile)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    image_file = str(imgdir)
+    img = keras.preprocessing.image.load_img(image_file, target_size=image_size)
+    img_array = keras.preprocessing.image.img_to_array(img)
+    if (div):
+        img_array = img_array / 255.0
+
+    iamge_dir = f'./image'
+    export_input_image(img_array, iamge_dir, image_file, int_flag=False)
+
+    img_array = tf.expand_dims(img_array, 0)  # Create batch axis
+
+    interpreter.set_tensor(input_details[0]['index'], img_array)
+    interpreter.invoke()
+    predictions = interpreter.get_tensor(output_details[0]['index'])
+    print(f"[DEBUG] {image_file}:{predictions}")
+
+def classification_single_float(mdlfile, imgdir, image_size, div=False):
     model = load_model(mdlfile)
     model.summary()
 
@@ -44,7 +72,7 @@ def classification_single(mdlfile, imgdir, image_size, int_flag=False, div=False
         img_array = img_array / 255.0
 
     iamge_dir = f'./image'
-    export_input_image(img_array, iamge_dir, image_file, int_flag)
+    export_input_image(img_array, iamge_dir, image_file, int_flag=False)
 
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis
 
@@ -71,7 +99,7 @@ def classification_single(mdlfile, imgdir, image_size, int_flag=False, div=False
                    'batch_normalization_4',
                    'activation_4',
                    'dense_1']
-    export_input_layer(model, img_array, layer_dir, sub_dir, layer_names, int_flag)
+    export_input_layer(model, img_array, layer_dir, sub_dir, layer_names, int_flag=False)
 
     predictions = model.predict(img_array)
     print(f"[DEBUG] {image_file}:{predictions}")
