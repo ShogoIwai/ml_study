@@ -16,7 +16,8 @@ def array_dump(array, fname, aname, iflag=False):
     ofs.write(header)
     for i in range(array.size):
         if (iflag):
-            convint = int(array[i]*256)
+            # convint = int(array[i]*256)
+            convint = int(array[i])
             ofs.write(f'{convint}')
         else:
             ofs.write(f'{array[i]}')
