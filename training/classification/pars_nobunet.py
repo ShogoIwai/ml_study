@@ -102,7 +102,10 @@ def read_hdf5(rfile, wpath, iflag=False):
                 write_file = re.sub('$', '.h', write_file)
                 try:
                     if re.search('optimizer_weights', write_file): raise Exception
-                    ad.array_dump(f[(key)], write_file, array_name, iflag=False)
+                    if iflag == True and re.search('conv2d', write_file):
+                        ad.array_dump(f[(key)], write_file, array_name, iflag=True)
+                    else:
+                        ad.array_dump(f[(key)], write_file, array_name, iflag=False)
                 except Exception:
                     pass
 
@@ -111,6 +114,7 @@ if __name__ == '__main__':
     model_filename = opts['mdl']
     weights_dirname = './weights'
     if 'int' in opts.keys():
-        read_tflite(model_filename, weights_dirname, iflag=True)
+        # read_tflite(model_filename, weights_dirname, iflag=True)
+        read_hdf5(model_filename, weights_dirname, iflag=True)
     else:
         read_hdf5(model_filename, weights_dirname, iflag=False)
